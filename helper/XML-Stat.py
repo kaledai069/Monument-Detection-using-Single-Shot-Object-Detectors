@@ -27,7 +27,7 @@ def xml_to_df(path):
 def main(path,csv_name):
     dataframe = xml_to_df(f'{path}')
     new_dataframe = dataframe.groupby(['class']).count()
-    new_dataframe[["filename"]].to_csv(f"./Report/{csv_name}.csv")
+    new_dataframe[["filename"]].to_csv(f"./{csv_name}.csv")
 
 if __name__ == '__main__':
     path_name = sys.argv[1]

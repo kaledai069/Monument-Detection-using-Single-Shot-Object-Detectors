@@ -57,10 +57,10 @@ def get_head_from_outputs(hyper_params, outputs):
     boxes_head = []
     for i, output in enumerate(outputs):
         aspect_ratio = len_aspect_ratios[i]
-        labels_head.append(Conv2D(aspect_ratio * total_labels, (3, 3), padding="same", name="{}_conv_label_output".format(i+1))(output))
-        boxes_head.append(Conv2D(aspect_ratio * 4, (3, 3), padding="same", name="{}_conv_boxes_output".format(i+1))(output))
-        # labels_head.append(SeparableConv2D(filters = aspect_ratio * total_labels, kernel_size = (3, 3), padding = "same", name = f"{i+1}_separable_conv_label_output")(output))
-        # boxes_head.append(SeparableConv2D(filters = aspect_ratio * total_labels, kernel_size = (3, 3), padding = "same", name = f"{i+1}_separable_conv_boxes_output"))(output)
+        # labels_head.append(Conv2D(aspect_ratio * total_labels, (3, 3), padding="same", name="{}_conv_label_output".format(i+1))(output))
+        # boxes_head.append(Conv2D(aspect_ratio * 4, (3, 3), padding="same", name="{}_conv_boxes_output".format(i+1))(output))
+        labels_head.append(SeparableConv2D(filters = aspect_ratio * total_labels, kernel_size = (3, 3), padding = "same", name = f"{i+1}_separable_conv_label_output")(output))
+        boxes_head.append(SeparableConv2D(filters = aspect_ratio * 4, kernel_size = (3, 3), padding = "same", name = f"{i+1}_separable_conv_boxes_output")(output))
     #
     pred_labels = HeadWrapper(total_labels, name="labels_head")(labels_head)
     pred_labels = Activation("softmax", name="conf")(pred_labels)
