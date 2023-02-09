@@ -4,3 +4,5 @@ Assets/
 CSV files/
 Tensorboard Log Files/
 ./Evaluations/log/Figures/
+.ipynb_checkpoints/
+__pycache__/
