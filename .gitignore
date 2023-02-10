@@ -3,6 +3,6 @@ Curves and Graphs/
 Assets/
 CSV files/
 Tensorboard Log Files/
-./Evaluations/log/Figures/
+Evaluations/log/Figures/
 .ipynb_checkpoints/
 __pycache__/

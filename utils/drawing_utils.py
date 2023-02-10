@@ -56,6 +56,8 @@ def draw_bboxes_with_labels(img, bboxes, label_indices, probs, labels):
     image = tf.keras.preprocessing.image.array_to_img(img)
     width, height = image.size
     draw = ImageDraw.Draw(image)
+    pred_labels = list()
+
     for index, bbox in enumerate(bboxes):
         y1, x1, y2, x2 = tf.split(bbox, 4)
         width = x2 - x1
@@ -63,12 +65,13 @@ def draw_bboxes_with_labels(img, bboxes, label_indices, probs, labels):
         if width <= 0 or height <= 0:
             continue
         label_index = int(label_indices[index])
+        pred_labels.append(labels[label_index])
         color = tuple(colors[label_index].numpy())
         label_text = "{0} {1:0.3f}".format(labels[label_index], probs[index])
         draw.text((x1 + 4, y1 + 2), label_text, fill=color)
         draw.rectangle((x1, y1, x2, y2), outline=color, width=3)
     #
-    plt.figure()
+    plt.figure(figsize = (8, 5), dpi = 120)
     plt.imshow(image)
     plt.show()
 
