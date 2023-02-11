@@ -61,6 +61,8 @@ ssd_val_feed = train_utils.generator(val_data, prior_boxes, hyper_params)
 checkpoint_callback = ModelCheckpoint(ssd_model_path, monitor="val_loss", save_best_only=True, save_weights_only=True)
 tensorboard_callback = TensorBoard(log_dir=ssd_log_path)
 learning_rate_callback = LearningRateScheduler(train_utils.scheduler, verbose=0)
+history_logger = tf.keras.callbacks.CSVLogger('./save_log.csv', separator = ',', append = True)
+early_stopper = tf.keras.callbacks.EarlyStopping(monitor = 'val_loss', patience = 10)
 
 
 step_size_train = train_utils.get_step_size(train_total_items, batch_size)

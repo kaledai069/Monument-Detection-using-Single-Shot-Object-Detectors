@@ -1,5 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras.layers import Layer, Input, Conv2D, MaxPool2D, Activation, SeparableConv2D
+from tensorflow.keras.regularizers import l2
 
 class HeadWrapper(Layer):
     """Merging all feature maps for detections.
@@ -50,6 +51,8 @@ def get_head_from_outputs(hyper_params, outputs):
         pred_deltas = merged outputs for bbox delta head
         pred_labels = merged outputs for bbox label head
     """
+    label_reg_factor = 5e-3
+    box_reg_factor = 1e-3
     total_labels = hyper_params["total_labels"]
     # +1 for ratio 1
     len_aspect_ratios = [len(x) + 1 for x in hyper_params["aspect_ratios"]]
@@ -59,11 +62,11 @@ def get_head_from_outputs(hyper_params, outputs):
         aspect_ratio = len_aspect_ratios[i]
         # labels_head.append(Conv2D(aspect_ratio * total_labels, (3, 3), padding="same", name="{}_conv_label_output".format(i+1))(output))
         # boxes_head.append(Conv2D(aspect_ratio * 4, (3, 3), padding="same", name="{}_conv_boxes_output".format(i+1))(output))
-        labels_head.append(SeparableConv2D(filters = aspect_ratio * total_labels, kernel_size = (3, 3), padding = "same", name = f"{i+1}_separable_conv_label_output")(output))
-        boxes_head.append(SeparableConv2D(filters = aspect_ratio * 4, kernel_size = (3, 3), padding = "same", name = f"{i+1}_separable_conv_boxes_output")(output))
-    #
+        labels_head.append(SeparableConv2D(filters = aspect_ratio * total_labels, kernel_size = (3, 3), padding = "same", name = f"{i+1}_separable_conv_label_output", depthwise_regularizer = l2(label_reg_factor), pointwise_regularizer = l2(label_reg_factor))(output))
+        boxes_head.append(SeparableConv2D(filters = aspect_ratio * 4, kernel_size = (3, 3), padding = "same", name = f"{i+1}_separable_conv_boxes_output", depthwise_regularizer = l2(box_reg_factor), pointwise_regularizer = l2(box_reg_factor))(output))
+    
     pred_labels = HeadWrapper(total_labels, name="labels_head")(labels_head)
     pred_labels = Activation("softmax", name="conf")(pred_labels)
-    #
+    
     pred_deltas = HeadWrapper(4, name="loc")(boxes_head)
     return pred_deltas, pred_labels
