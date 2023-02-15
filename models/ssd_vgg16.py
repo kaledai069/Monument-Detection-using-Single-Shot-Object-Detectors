@@ -102,4 +102,4 @@ def init_model(model):
         model = tf.keras.model
 
     """
-    model(tf.random.uniform((1, 512, 512, 3)))
+    model(tf.random.uniform((1, 300, 300, 3)))

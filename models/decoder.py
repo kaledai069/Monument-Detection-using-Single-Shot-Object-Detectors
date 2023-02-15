@@ -16,7 +16,7 @@ class SSDDecoder(Layer):
             1 to total label number
         pred_scores = (batch_size, top_n)
     """
-    def __init__(self, prior_boxes, variances, max_total_size=200, score_threshold=0.7, **kwargs):
+    def __init__(self, prior_boxes, variances, max_total_size=200, score_threshold=0.65, **kwargs):
         super(SSDDecoder, self).__init__(**kwargs)
         self.prior_boxes = prior_boxes
         self.variances = variances
