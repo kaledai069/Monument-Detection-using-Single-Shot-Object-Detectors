@@ -1,0 +1,6 @@
+loc_loss_alpha = 2
+learning rate = 1e-5
+reg_factor = 1e-3
+label_reg_factor = 9e-2
+batch_size = 16
+epochs = 80
