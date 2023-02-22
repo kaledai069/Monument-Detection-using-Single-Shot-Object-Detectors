@@ -25,7 +25,30 @@ SSD = {
     }
 }
 
-def get_hyper_params(backbone, **kwargs):
+SSD_512 = {
+    "vgg16": {
+        "img_size": 300,
+        "feature_map_shapes": [38, 19, 10, 5, 3, 1],
+        "aspect_ratios": [[1., 2., 1./2.],
+                         [1., 2., 1./2., 3., 1./3.],
+                         [1., 2., 1./2., 3., 1./3.],
+                         [1., 2., 1./2., 3., 1./3.],
+                         [1., 2., 1./2.],
+                         [1., 2., 1./2.]],
+    },
+    "mobilenet_v2": {
+        "img_size": 512,
+        "feature_map_shapes": [32, 16, 8, 4, 2, 1],
+        "aspect_ratios": [[1., 2., 1./2.],
+                         [1., 2., 1./2., 3., 1./3.],
+                         [1., 2., 1./2., 3., 1./3.],
+                         [1., 2., 1./2., 3., 1./3.],
+                         [1., 2., 1./2.],
+                         [1., 2., 1./2.]],
+    }
+}
+
+def get_hyper_params(backbone, upscale = False, **kwargs):
     """Generating hyper params in a dynamic way.
     inputs:
         **kwargs = any value could be updated in the hyper_params
@@ -33,7 +56,10 @@ def get_hyper_params(backbone, **kwargs):
     outputs:
         hyper_params = dictionary
     """
-    hyper_params = SSD[backbone]
+    if upscale:
+        hyper_params = SSD_512[backbone]
+    else:
+        hyper_params = SSD[backbone]
     hyper_params["iou_threshold"] = 0.50
     hyper_params["neg_pos_ratio"] = 3
     hyper_params["loc_loss_alpha"] = 1

@@ -116,12 +116,12 @@ def random_rotation(ORI_BASE_DIR, AUG_BASE_DIR, file_name, m_name, extra = None)
         xmax = int(bndbox.find("xmax").text)
         ymax = int(bndbox.find("ymax").text)
 
-        ymin = 300 - ymin
-        ymax = 300 - ymax
+        ymin = 512 - ymin
+        ymax = 512 - ymax
 
-        # Find the center of the bounding box
-        center_x = 150
-        center_y = 150
+        # Find the center of the image
+        center_x = 256
+        center_y = 256
 
         # Calculate the new bounding box coordinates
         xmin_new = round(center_x + (xmin - center_x) * math.cos(angle) - (ymin - center_y) * math.sin(angle))
@@ -129,36 +129,47 @@ def random_rotation(ORI_BASE_DIR, AUG_BASE_DIR, file_name, m_name, extra = None)
         xmax_new = round(center_x + (xmax - center_x) * math.cos(angle) - (ymax - center_y) * math.sin(angle))
         ymax_new = round(center_y + (xmax - center_x) * math.sin(angle) + (ymax - center_y) * math.cos(angle))
 
-        ymin_new = 300 - ymin_new
-        ymax_new = 300 - ymax_new
+        ymin_new = 512 - ymin_new
+        ymax_new = 512 - ymax_new
 
         xmin1 = min([xmin_new,xmax_new])
         xmax1 = max([xmin_new,xmax_new])
         ymin1 = min([ymin_new,ymax_new])
         ymax1 = max([ymin_new,ymax_new])
 
-        # calculate factors by which bounding box width might increase            
-        width_reduce_factor = 0.8 - 0.02 * (degree - 10)
-        reduced_width = width_reduce_factor * (xmax1 - xmin1)
-        center_x = (xmax1 + xmin1) / 2
+        # changing y by some suitable value ()
+        if(degree < 0):
+            xminTemp = xmin + degree
+            xmaxTemp = xmax - degree
+        else:
+            # calculate factors by which bounding box width might increase            
+            width_reduce_factor = 0.8 - 0.02 * (degree-10)
+            reduced_width = width_reduce_factor * (xmax1-xmin1)
+            center_x = (xmax1 + xmin1)/2
+            #changing x
+            xmin1 = round(center_x - reduced_width/2)
+            xmax1 = round(center_x + reduced_width/2)
+            xminTemp = min([xmin1,xmax1])
+            xmaxTemp = max([xmin1,xmax1])
 
-        xmin1 = round(center_x - reduced_width / 2)
-        xmax1 = round(center_x + reduced_width / 2)
+        #changing y
+        reduced_height = (ymax-ymin)-(ymax1-ymin1)
+        ymin1 = round(ymin1 - reduced_height/2)
+        ymax1 = round(ymax1 + reduced_height/2)
+        yminTemp = min([ymin1,ymax1])
+        ymaxTemp = max([ymin1,ymax1])
 
-        reduced_height = (ymax - ymin)-(ymax1 - ymin1)
-        ymin1 = round(ymin1 - reduced_height / 2)
-        ymax1 = round(ymax1 + reduced_height / 2)
-        
-        # handles corner cases
-        dim_arr = [ xmin1 , ymin1, xmax1, ymax1 ] 
+        # checking if final values are between 0 and 300 or 512
+        dim_arr = [ xminTemp , yminTemp, xmaxTemp, ymaxTemp ]
+
         for y in range(0,4):
             i = dim_arr[y]
             i = i if i >= 0 else 0
-            i = i if i <= 300 else 300
-            dim_arr[y] = i
+            i = i if i <= 512 else 512
+            dim_arr[y] = round(i)
 
         xmin1 , ymin1, xmax1, ymax1 = dim_arr
-    
+
         # Update the bounding box coordinates in the annotation file
         bndbox.find("xmin").text = str(xmin1)
         bndbox.find("ymin").text = str(ymin1)
@@ -184,7 +195,7 @@ def random_translation(ORI_BASE_DIR, AUG_BASE_DIR, file_name, m_name = None, t_t
     image = tf.io.read_file(image_path)
     image = tf.image.decode_jpeg(image, channels=3)
 
-    dx_dy_list = [[30,0],[0,30],[-30,0],[0,-30],[30,30],[-30,-30],[-30,30],[30,-30]]
+    dx_dy_list = [[40,0],[0,40],[-40,0],[0,-40],[40,40],[-40,-40],[-40,40],[40,-40]]
     dx_dy = dx_dy_list[t_type]
     # Perform translation augmentation
     image = tfa.image.translate(image, dx_dy,"bilinear","constant")
@@ -216,7 +227,7 @@ def random_translation(ORI_BASE_DIR, AUG_BASE_DIR, file_name, m_name = None, t_t
         for y in range(0,4):
             i = dim_arr[y]
             i = i if i >= 0 else 0
-            i = i if i <= 300 else 300
+            i = i if i <= 512 else 512
             dim_arr[y] = i
 
         xmin1 , ymin1, xmax1, ymax1 = dim_arr
@@ -340,13 +351,13 @@ def multiple_orient(ORI_BASE_DIR, AUG_BASE_DIR, file_name, m_name):
         for obj in root.iter("object"):
             bndbox = obj.find("bndbox")
             xmin = int(bndbox.find("xmin").text)
-            ymin = 300 - int(bndbox.find("ymin").text)
+            ymin = 512 - int(bndbox.find("ymin").text)
             xmax = int(bndbox.find("xmax").text)
-            ymax = 300 - int(bndbox.find("ymax").text)
+            ymax = 512 - int(bndbox.find("ymax").text)
 
             # Find the center of the bounding box
-            center_x = 150
-            center_y = 150
+            center_x = 256
+            center_y = 256
 
             # Calculate the new bounding box coordinates
             xmin_new = round(center_x + (xmin - center_x) * math.cos(angle) - (ymin - center_y) * math.sin(angle))
@@ -354,8 +365,8 @@ def multiple_orient(ORI_BASE_DIR, AUG_BASE_DIR, file_name, m_name):
             xmax_new = round(center_x + (xmax - center_x) * math.cos(angle) - (ymax - center_y) * math.sin(angle))
             ymax_new = round(center_y + (xmax - center_x) * math.sin(angle) + (ymax - center_y) * math.cos(angle))
 
-            ymin_new = 300 - round(ymin_new)
-            ymax_new = 300 - round(ymax_new)
+            ymin_new = 512 - round(ymin_new)
+            ymax_new = 512 - round(ymax_new)
 
             xmin1 = min([xmin_new,xmax_new])
             xmax1 = max([xmin_new,xmax_new])
@@ -366,7 +377,7 @@ def multiple_orient(ORI_BASE_DIR, AUG_BASE_DIR, file_name, m_name):
             for y in range(0,4):
                 i = dim_arr[y]
                 i = i if i >= 0 else 0
-                i = i if i <= 300 else 300
+                i = i if i <= 512 else 512
                 dim_arr[y] = i
 
             xmin1 , ymin1, xmax1, ymax1 = dim_arr
